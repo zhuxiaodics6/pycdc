@@ -1,0 +1,34 @@
+name: Build pycdc on Windows
+
+on:
+  workflow_dispatch:  # 手动触发，也可以改成 push
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: ✅ Checkout pycdc
+      uses: actions/checkout@v3
+      with:
+        repository: zrax/pycdc
+        path: pycdc
+
+    - name: 🧰 Install CMake
+      uses: lukka/get-cmake@v3
+
+    - name: 🏗️ Configure and Build with MSVC
+      working-directory: pycdc
+      run: |
+        mkdir build
+        cd build
+        cmake .. -G "Visual Studio 17 2022" -A x64
+        cmake --build . --config Release
+
+    - name: 📦 Upload Windows binaries
+      uses: actions/upload-artifact@v4
+      with:
+        name: pycdc-windows
+        path: |
+          pycdc/build/Release/pycdc.exe
+          pycdc/build/Release/pycdas.exe
